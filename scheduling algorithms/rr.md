@@ -1,72 +1,129 @@
-### Round Robin (RR) CPU Scheduling Algorithm
+Absolutely 👍 Here’s a **clear and structured algorithm** describing the **Round Robin Scheduling Program** implemented in your C code:  
 
-The provided C program implements the **Round Robin (RR)** CPU scheduling algorithm. RR is a preemptive scheduling algorithm where each process is assigned a fixed time slice (called a time quantum) for execution. If a process does not complete within its time quantum, it is preempted and moved to the end of the ready queue, allowing the next process to execute.
+---
 
-#### Algorithm Steps
+### **Algorithm: Round Robin CPU Scheduling**
 
-1. **Input Collection**:
-   - Prompt the user to enter the number of processes `n`.
-   - For each process, collect:
-     - Arrival Time (`AT`)
-     - Burst Time (`BT`)
-   - Assign a unique Process ID (`PID`) to each process (1-based index).
+**Goal:**  
+Simulate Round Robin CPU scheduling for a set of processes and compute each process’s **Completion Time (CT)**, **Turnaround Time (TAT)**, and **Waiting Time (WT)** along with average TAT and WT.
 
-2. **Initialization**:
-   - Sort all processes based on:
-     - Arrival Time (ascending)
-     - Burst Time (ascending, if arrival times are equal)
-     - Process ID (ascending, if both arrival and burst times are equal)
-   - Prompt the user to enter the time quantum `TQ`.
+---
 
-3. **Data Structures**:
-   - Initialize a dynamic circular queue `Q` to hold indices of processes in the ready state.
-   - Initialize variables:
-     - `next`: Index of the next process in the sorted array not yet enqueued.
-     - `completed`: Counter for the number of completed processes.
-     - `current_time`: Current simulation time, initialized to the arrival time of the first process (or 0 if no processes).
+#### **Step 1: Input number of processes**
+1. Read the total number of processes `n`.
 
-4. **Main Scheduling Loop**:
-   - Enqueue all processes that have arrived at or before `current_time` into `Q`.
-   - While there are processes to be scheduled (`completed < n`):
-     - If the ready queue `Q` is empty:
-       - If there are still processes that haven't arrived:
-         - Jump `current_time` to the arrival time of the next process.
-         - Enqueue all processes that arrive at this new `current_time`.
-       - Else, break the loop (no more processes).
-     - Dequeue the next process index `idx` from `Q`.
-     - Determine the execution time `exec` for this quantum:
-       - `exec = min(remaining burst time of process[idx], TQ)`
-     - Execute the process for `exec` time units:
-       - Decrement the remaining burst time of the process: `process[idx].rem_bt -= exec`
-       - Advance the simulation time: `current_time += exec`
-     - Enqueue any processes that arrived while the current process was executing (between `current_time - exec` and `current_time`).
-     - If the process has finished (`process[idx].rem_bt == 0`):
-       - Record Completion Time (`CT`) as `current_time`.
-       - Calculate Turnaround Time (`TAT = CT - AT`).
-       - Calculate Waiting Time (`WT = TAT - BT`).
-       - Mark the process as completed.
-       - Increment the `completed` counter.
-     - Else (process is not finished):
-       - Re-enqueue the process index `idx` at the back of `Q`.
+---
 
-5. **Output Results**:
-   - Print a table with the following details for each process:
-     - PID
-     - Arrival Time (`AT`)
-     - Burst Time (`BT`)
-     - Completion Time (`CT`)
-     - Turnaround Time (`TAT`)
-     - Waiting Time (`WT`)
-   - Calculate and print:
-     - Average Waiting Time (`AWT = Total WT / n`)
-     - Average Turnaround Time (`ATAT = Total TAT / n`)
+#### **Step 2: Input process details**
+2. For each process `i` (from 1 to n):
+   - Assign a **process ID** = `i`.
+   - Read its **Arrival Time (AT)**.
+   - Read its **Burst Time (BT)**.
+   - Set **Remaining Burst Time (rem_bt = BT)**.
+   - Initialize **CT**, **WT**, **TAT**, and **is_completed** = 0.
 
-6. **Cleanup**:
-   - Free the dynamically allocated memory for the queue and processes array.
+---
 
-#### Key Features of the Implementation
+#### **Step 3: Sort processes**
+3. Sort all processes according to:
+   - Arrival time (ascending),
+   - If tie → Burst time (ascending),
+   - If tie again → Process ID (ascending).  
+   *(Ensures fairness and order of arrival.)*
 
-- **Dynamic Queue**: The ready queue dynamically resizes itself when full, ensuring efficient memory usage.
-- **Preemption**: Processes are preempted after their time quantum expires.
-- **Arrival Handling**: The algorithm correctly handles processes arriving at different times by enqueuing them as they arrive during the simulation.
-- **Completion Tracking**: Each process's completion time, turnaround time, and waiting time are calculated upon completion.
+---
+
+#### **Step 4: Input time quantum**
+4. Read the **Time Quantum (TQ)** value.
+
+---
+
+#### **Step 5: Initialize queue and variables**
+5. Create a circular **queue** to store process indices.  
+6. Initialize:
+   - `current_time` = arrival time of the first process.
+   - `next` = index of the next unqueued process (initially 0).
+   - `completed` = 0 (number of processes finished).
+
+7. Enqueue all processes that have already **arrived** by `current_time`.
+
+---
+
+#### **Step 6: Main scheduling loop**
+8. **While** (number of completed processes < total number of processes):
+
+   - **Case 1:** If queue is empty:
+     - Move time to the arrival time of the next process (`current_time = p[next].at`).
+     - Enqueue any new processes that have now arrived.
+     - **Continue** to next iteration.
+
+   - **Case 2:** If queue is not empty:
+     - **Dequeue** a process index `idx`.
+     - **Run** this process for:
+       \[
+       exec = \min(rem\_bt[idx], time\_quantum)
+       \]
+       Meaning, process executes for either TQ or until it finishes.
+     - Reduce its remaining burst:  
+       \[
+       rem\_bt[idx] = rem\_bt[idx] - exec
+       \]
+     - Increment the current time:  
+       \[
+       current\_time += exec
+       \]
+
+     - Enqueue all newly arrived processes whose arrival time ≤ current_time.
+
+     - **If** process finished (`rem_bt == 0`):
+       - Compute and set  
+         \[
+         CT = current\_time
+         \]
+         \[
+         TAT = CT - AT
+         \]
+         \[
+         WT = TAT - BT
+         \]
+       - Mark process as completed.  
+       - Increment `completed`.
+
+     - **Else** (still has remaining burst):
+       - Re-enqueue the process back into the queue.
+
+---
+
+#### **Step 7: After scheduling**
+9. For each process, print:
+   - Process ID, Arrival Time, Burst Time, Completion Time, Turnaround Time, and Waiting Time.
+
+---
+
+#### **Step 8: Compute averages**
+10. Compute and display:
+    - **Average Turnaround Time**
+      \[
+      Avg\_TAT = \frac{\sum TAT}{n}
+      \]
+    - **Average Waiting Time**
+      \[
+      Avg\_WT = \frac{\sum WT}{n}
+      \]
+
+---
+
+#### **Step 9: End**
+11. Free dynamically allocated memory (for queue and process array).  
+12. **End of program.**
+
+---
+
+### **Output:**
+- Tabular report of all processes (PID, AT, BT, CT, TAT, WT)
+- Average Waiting Time  
+- Average Turnaround Time  
+
+---
+
+Would you like me to also give you a **flowchart** version of this algorithm (can be image-based)? It would visually show how the Round Robin scheduling loop works.
