@@ -1,111 +1,56 @@
-### Algorithm — Non‑preemptive SJF with arrival times
+## Algorithm for Shortest Job First (SJF) Non-Preemptive CPU Scheduling
 
-#### Problem
-Schedule n processes using non-preemptive Shortest Job First (SJF) with arrival times. For each process compute completion time (CT), turnaround time (TAT), waiting time (WT) and the average WT/TAT.
+### Data Structure
+- **Process**: Contains pid, arrival_time (at), burst_time (bt), completion_time (ct), waiting_time (wt), turnaround_time (tat), is_completed flag
 
-#### Inputs
-- n: number of processes
-- For each process i:
-  - pid (process id)
-  - at (arrival time)
-  - bt (burst time)
+### Algorithm Steps
 
-#### Outputs
-- For each process: ct, tat, wt
-- Average waiting time (AWT) and average turnaround time (ATAT)
+1. **Input Phase**
+   - Read number of processes (n)
+   - For each process i from 1 to n:
+     - Assign pid = i
+     - Read arrival_time and burst_time
+     - Initialize wt, ct, tat, is_completed to 0
 
-#### Key idea
-1. Sort processes by arrival time (tie-break: burst time, then pid).
-2. Maintain a current time and repeatedly pick, among arrived and not-yet-completed processes, the one with the smallest burst time.
-3. If none has arrived yet, advance current time by 1.
-4. When a process is selected, run it to completion (non-preemptive), update its CT, TAT and WT, mark it completed, and update totals.
-5. Repeat until all processes are completed.
+2. **Sorting Phase**
+   - Sort processes by arrival_time (ascending)
+   - If arrival_time is same, sort by burst_time (ascending)
+   - If both same, sort by pid (ascending)
 
-#### Detailed step-by-step algorithm
-1. Read n.
-2. For i = 1..n:
-   - Read arrival time at[i] and burst time bt[i].
-   - Initialize ct[i] = tat[i] = wt[i] = 0, is_completed[i] = false.
-   - Set pid[i] = i.
-3. Sort processes by (at, bt, pid).
-4. completed = 0, current_time = 0, total_wt = 0, total_tat = 0.
-5. While completed < n:
-   1. idx = -1, min_bt = +infinity.
-   2. For each process i from 0..n-1:
-      - If at[i] <= current_time and not is_completed[i]:
-        - If bt[i] < min_bt:
-          - min_bt = bt[i], idx = i.
-        - Else if bt[i] == min_bt and at[i] < at[idx]:
-          - idx = i.   (tie-breaker: earlier arrival)
-   3. If idx == -1:
-      - current_time = current_time + 1 (no process available yet).
-   4. Else:
-      - current_time = current_time + bt[idx].
-      - ct[idx] = current_time.
-      - tat[idx] = ct[idx] - at[idx].
-      - wt[idx] = tat[idx] - bt[idx].
-      - total_tat += tat[idx], total_wt += wt[idx].
-      - is_completed[idx] = true.
-      - completed = completed + 1.
-6. Compute averages:
-   - AWT = total_wt / n
-   - ATAT = total_tat / n
-7. Print per-process details and AWT, ATAT.
+3. **Scheduling Phase**
+   - Initialize: completed = 0, current_time = 0, total_wt = 0, total_tat = 0
+   - While completed < n:
+     - **Find shortest job:**
+       - Set idx = -1, min_bt = ∞
+       - For each process i:
+         - If (arrival_time[i] ≤ current_time AND not completed):
+           - If burst_time[i] < min_bt:
+             - min_bt = burst_time[i]
+             - idx = i
+           - If burst_time[i] == min_bt AND arrival_time[i] < arrival_time[idx]:
+             - idx = i
+     
+     - **Execute process:**
+       - If idx == -1 (no process available):
+         - Increment current_time by 1 (CPU idle)
+       - Else:
+         - current_time += burst_time[idx]
+         - completion_time[idx] = current_time
+         - turnaround_time[idx] = completion_time[idx] - arrival_time[idx]
+         - waiting_time[idx] = turnaround_time[idx] - burst_time[idx]
+         - total_tat += turnaround_time[idx]
+         - total_wt += waiting_time[idx]
+         - Mark is_completed[idx] = 1
+         - Increment completed
 
-#### Pseudocode
-```text
-INPUT n
-for i = 0 to n-1:
-    pid[i] = i+1
-    read at[i], bt[i]
-    ct[i] = tat[i] = wt[i] = 0
-    is_completed[i] = false
+4. **Output Phase**
+   - For each process:
+     - Print pid, arrival_time, burst_time, waiting_time, turnaround_time
+   - Print average_waiting_time = total_wt / n
+   - Print average_turnaround_time = total_tat / n
 
-sort processes by (at asc, bt asc, pid asc)
+### Time Complexity
+- O(n log n) for sorting + O(n²) for scheduling = **O(n²)**
 
-completed = 0
-current_time = 0
-total_wt = total_tat = 0
-
-while completed < n:
-    idx = -1
-    min_bt = INF
-    for i = 0 to n-1:
-        if at[i] <= current_time and not is_completed[i]:
-            if bt[i] < min_bt:
-                min_bt = bt[i]
-                idx = i
-            else if bt[i] == min_bt and at[i] < at[idx]:
-                idx = i
-
-    if idx == -1:
-        current_time = current_time + 1
-    else:
-        current_time = current_time + bt[idx]
-        ct[idx] = current_time
-        tat[idx] = ct[idx] - at[idx]
-        wt[idx] = tat[idx] - bt[idx]
-        total_tat += tat[idx]
-        total_wt += wt[idx]
-        is_completed[idx] = true
-        completed += 1
-
-AWT = total_wt / n
-ATAT = total_tat / n
-
-PRINT details and averages
-```
-
-#### Time and space complexity
-- Sorting: O(n log n)
-- Main scheduling loop: in worst case you scan all processes for each completion → O(n^2)
-- Overall: O(n^2) time, O(n) extra space.
-
-#### Notes / Assumptions / Improvements
-- This is non-preemptive SJF (once a process starts, it runs to completion).
-- Tie-breaking:
-  - Initial sort: by arrival time, then burst time, then pid.
-  - Selection: chooses smallest bt among arrived processes; if bt equal, the one with earlier arrival is chosen.
-- If you want better performance for large n, use a min-heap (priority queue) keyed by burst time for arrived processes; that gives O(n log n) scheduling after sorting arrivals.
-- Edge case: if there are gaps with no arrived process, current_time is incremented by 1 each loop; you can instead jump to the next earliest arrival time to reduce unnecessary iterations.
-
+### Space Complexity
+- **O(n)** for storing n processes
