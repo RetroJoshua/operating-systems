@@ -1,95 +1,93 @@
-### Algorithm for Priority-Based Round Robin Scheduling
+## **Algorithm: Non-Preemptive Priority Scheduling**
 
-This algorithm implements a hybrid CPU scheduling approach that combines **priority-based selection** with **Round Robin (RR) execution**. Processes are selected based on their priority, but within the same priority level, they are executed using Round Robin with a fixed time quantum.
+### **Input:**
+- Number of processes (n)
+- For each process: Arrival Time (AT), Burst Time (BT), Priority
 
-#### Data Structures
+### **Output:**
+- Completion Time (CT), Turnaround Time (TAT), Waiting Time (WT) for each process
+- Average WT and Average TAT
 
-1. **Process Structure**:
-   - `pid`: Process ID
-   - `at`: Arrival time
-   - `bt`: Burst time (total CPU time needed)
-   - `rem_bt`: Remaining burst time
-   - `ct`: Completion time
-   - `wt`: Waiting time
-   - `tat`: Turnaround time
-   - `priority`: Priority of the process (lower number means higher priority)
-   - `is_completed`: Flag indicating completion status
+---
 
-2. **Priority Queue**:
-   - Implemented as a binary heap
-   - Stores indices of processes
-   - Maintains processes in order of priority
+### **Steps:**
 
-#### Algorithm Steps
+1. **Initialize:**
+   - Read number of processes `n`
+   - For each process `i` (1 to n):
+     - Assign Process ID = i
+     - Read Arrival Time, Burst Time, Priority
+   - Set `current_time = 0`, `completed = 0`
+   - Create array `is_completed[]` initialized to 0 (false)
 
-1. **Initialization**:
-   - Read the number of processes `n`
-   - For each process:
-     - Read arrival time, burst time, and priority
-     - Initialize remaining burst time to burst time
-     - Set completion, waiting, and turnaround times to 0
-     - Mark as not completed
+2. **Sort processes by Arrival Time** (for optimization)
+   - If arrival times are equal, sort by priority
+   - If priorities are also equal, sort by PID
 
-2. **Sorting**:
-   - Sort processes by arrival time, then by burst time, then by PID using `qsort`
+3. **Main Scheduling Loop:**
+   - **While** `completed < n`:
+     
+     a. **Select highest priority process:**
+        - Initialize `idx = -1`, `highest_priority = ∞`
+        - For each process `i`:
+          - If process is **not completed** AND **has arrived** (AT ≤ current_time):
+            - If priority[i] < highest_priority:
+              - Update `highest_priority = priority[i]`
+              - Update `idx = i`
+            - **Tie-breaking:** If priorities are equal, choose process with:
+              - Earlier arrival time, OR
+              - Smaller PID (if arrival times also equal)
+     
+     b. **Handle CPU idle time:**
+        - If `idx == -1` (no process available):
+          - Increment `current_time` by 1
+          - Continue to next iteration
+     
+     c. **Execute selected process:**
+        - `current_time = current_time + BT[idx]`
+        - `CT[idx] = current_time`
+        - `TAT[idx] = CT[idx] - AT[idx]`
+        - `WT[idx] = TAT[idx] - BT[idx]`
+        - Mark `is_completed[idx] = 1`
+        - Increment `completed`
 
-3. **Priority Queue Setup**:
-   - Initialize a priority queue with capacity `n + 4`
-   - Read time quantum for Round Robin scheduling
+4. **Calculate Averages:**
+   - `total_wt = sum of all WT`
+   - `total_tat = sum of all TAT`
+   - `avg_wt = total_wt / n`
+   - `avg_tat = total_tat / n`
 
-4. **Main Scheduling Loop**:
-   - Initialize `current_time` to the arrival time of the first process
-   - Initialize `completed` counter to 0
-   - Initialize `next` pointer to 0 (points to next process to be enqueued)
+5. **Display Results:**
+   - Print table: PID, AT, BT, Priority, CT, TAT, WT
+   - Print Average WT and Average TAT
 
-5. **Enqueue Initial Processes**:
-   - Enqueue all processes that have arrived at or before `current_time`
+6. **End**
 
-6. **Scheduling Execution**:
-   - While there are processes to be completed:
-     - If the priority queue is empty:
-       - If there are processes that haven't arrived yet:
-         - Jump `current_time` to the arrival time of the next process
-         - Enqueue all processes that arrive at this new time
-       - Else:
-         - Exit (no more processes)
-     - Dequeue the highest priority process from the queue
-     - Determine execution time as `min(rem_bt, time_quantum)`
-     - Execute the process for this time:
-       - Decrement `rem_bt` by execution time
-       - Increment `current_time` by execution time
-     - Enqueue any processes that arrived during execution
-     - If the process is completed (`rem_bt == 0`):
-       - Record completion time
-       - Calculate turnaround time (`ct - at`)
-       - Calculate waiting time (`tat - bt`)
-       - Mark as completed
-       - Increment `completed` counter
-     - Else:
-       - Re-enqueue the process in the priority queue
+---
 
-7. **Result Calculation**:
-   - For each process:
-     - Print PID, arrival time, burst time, priority, completion time, turnaround time, and waiting time
-   - Calculate and print average waiting time
-   - Calculate and print average turnaround time
+### **Key Points:**
+- **Non-preemptive:** Once a process starts, it runs until completion
+- **Priority-based:** Lower priority number = Higher priority
+- **Handles arrival times:** CPU may remain idle if no process has arrived
+- **Time Complexity:** O(n²) in worst case
 
-8. **Cleanup**:
-   - Free allocated memory for processes and priority queue
+---
 
-#### Priority Comparison Logic
+### **Example Trace:**
 
-When comparing two processes for priority queue ordering:
-1. Lower priority number means higher priority
-2. If priorities are equal:
-   - Earlier arrival time has higher priority
-   - If arrival times are equal:
-     - Shorter remaining burst time has higher priority
-     - If remaining burst times are equal:
-       - Lower PID has higher priority
+| Process | AT | BT | Priority |
+|---------|----|----|----------|
+| P1 | 0 | 4 | 2 |
+| P2 | 1 | 3 | 1 |
+| P3 | 2 | 1 | 3 |
 
-This algorithm ensures that:
-- Higher priority processes are executed first
-- Within the same priority level, processes are handled fairly using Round Robin
-- Processes are executed in the order they arrive when priorities and other factors are equal
-- Efficient scheduling with O(n log n) time complexity due to sorting and heap operations
+**Execution:**
+- Time 0: P1 arrives (priority 2), starts executing
+- Time 4: P1 completes, P2 (priority 1) and P3 (priority 3) available → P2 selected
+- Time 7: P2 completes, P3 executes
+- Time 8: P3 completes
+
+**Result:**
+- P1: CT=4, TAT=4, WT=0
+- P2: CT=7, TAT=6, WT=3
+- P3: CT=8, TAT=6, WT=5
