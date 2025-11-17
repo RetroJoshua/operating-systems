@@ -11,7 +11,7 @@ void main()
     char finish[10]; 
     printf("Enter the no. of processes and resources:"); 
     scanf("%d%d",&n,&m); 
-    for(i=0;i<n;i++)  // Bug fix: was i<=n, should be i<n
+    for(i=0;i<n;i++)  
         finish[i]='n'; 
     printf("Enter the claim matrix:\n"); 
     for(i=0;i<n;i++) 
@@ -30,7 +30,7 @@ void main()
         for(j=0;j<m;j++) 
             avail[j]+=alloc[i][j]; 
     for(i=0;i<m;i++) 
-        work[i]=total[i]-avail[i];  // Bug fix: simplified logic
+        work[i]=total[i]-avail[i];  // simplified logic
     for(i=0;i<n;i++) 
         for(j=0;j<m;j++) 
             need[i][j]=max[i][j]-alloc[i][j]; 
@@ -38,7 +38,7 @@ void main()
     { 
         c=0;
         for(j=0;j<m;j++) 
-        {  // Bug fix: added missing braces
+        {  // added missing braces
             if((need[i][j]<=work[j])&&(finish[i]=='n')) 
                 c++; 
         }
@@ -54,7 +54,7 @@ void main()
             finish[i]='y'; 
             printf("\nProcess %d executed?:%c \n",i+1,finish[i]); 
             count++; 
-            goto A;  // Bug fix: restart search after finding a process
+            goto A;  // restart search after finding a process
         } 
     } 
     if(count==n) 
@@ -62,5 +62,5 @@ void main()
     else
         printf("\n System is NOT in safe state"); 
     
-    getch();  // Bug fix: added to prevent console from closing
+    getch();  //  added to prevent console from closing
 }
