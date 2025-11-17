@@ -45,3 +45,35 @@ resource-allocation state is restored.
 9. or not if we allow the request. 
 10. stop the program. 
 11. end 
+
+
+OUTPUT: 
+ $make dal 
+ $./dal 
+Enter the no. of processes and resources: 4 3 
+Enter the claim matrix: 
+3 2 2 
+6 1 3 
+3 1 4 
+4 2 2 
+Enter the allocation matrix: 
+1 0 0 
+6 1 2 
+2 1 1 
+0 0 2 
+Resource vector:9 3 6 
+All the resources can be allocated to Process 2 
+Available resources are: 6 2 3 
+Process 2 executed?:y 
+All the resources can be allocated to Process 3 
+Avaiable resources are: 8 3 4 
+30     
+Prcess 3 executed?:y 
+All the resources can be allocated to Process 4 
+Avilable resources are: 8 3 6 
+Prcess 4 executed?:y 
+All the resources can be allocated to Process 1 
+Aailable resources are: 9 3 6 
+Prcess 1 executed?:y 
+System is in safe mode 
+The given state is safe state 
