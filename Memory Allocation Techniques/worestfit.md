@@ -11,3 +11,27 @@
 - Step 3: Start by picking each process and find the    maximum block size that can be assigned to  current process i.e., find max(bockSize[1], blockSize[2],.....blockSize[n]) >    processSize[current], 
 - Step 4:    if found then assign    it to the current process. 
 - Step 5: If not then leave that process and keep checking    the further processes.
+
+## Expected output:
+OUTPUT: 
+$make wf 
+$./wf 
+Enter the number of blocks: 3 
+Enter the number of files: 2 
+Enter the size of the blocks:- 
+Block 1: 5 
+Block 2: 2 
+Block 3: 7 
+Enter the size of the files:- 
+File 1: 1 
+File 2: 4
+File No   File Size     Block No       Block   Size                  
+1             1            1                            
+2             4            3     
+                               
+           
+5                             
+7                             
+Fragment 
+4 
+3 
