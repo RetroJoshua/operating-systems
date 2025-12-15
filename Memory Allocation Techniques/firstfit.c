@@ -1,5 +1,5 @@
-// C implementation of First-Fit algorithm
 #include <stdio.h>
+#define MAX 25
 
 // Function to allocate memory to blocks as per First fit algorithm
 void firstFit(int blockSize[], int m, int processSize[], int n)
@@ -54,16 +54,28 @@ void firstFit(int blockSize[], int m, int processSize[], int n)
 // Driver code
 int main()
 {
-    int blockSize[] = {100, 500, 200, 300, 600};
-    int processSize[] = {212, 417, 112, 426};
-    int m = sizeof(blockSize) / sizeof(blockSize[0]);
-    int n = sizeof(processSize) / sizeof(processSize[0]);
+    int nb, np;
+    int blockSize[MAX];
+    int processSize[MAX];
+    int m, n;
 
-    printf("Memory Blocks: ");
-    for (int i = 0; i < m; i++)
-        printf("%d KB ", blockSize[i]);
-    printf("\n");
-
+    printf("Enter number of Processes: ");
+    scanf("%d", &np);
+    printf("Enter number of Blocks: ");
+    scanf("%d", &nb);
+    
+    for(int i = 0; i < np; i++){
+        printf("Enter size of Process %d: ", i + 1);
+        scanf("%d", &processSize[i]);
+    }
+    
+    for(int i = 0; i < nb; i++){
+        printf("Enter size of Block %d: ", i + 1);
+        scanf("%d", &blockSize[i]);
+    }
+    
+    m = nb;
+    n = np;
     firstFit(blockSize, m, processSize, n);
 
     return 0;

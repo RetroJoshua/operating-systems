@@ -27,27 +27,45 @@ int main()
     
     for (i = 1; i <= nf; i++)
     {
+        lowest = 10000;
+        ff[i] = 0;  // Initialize to 0 (no block allocated)
+        
         for (j = 1; j <= nb; j++)
         {
-            if (bf[j] != 1)
+            if (bf[j] != 1)  // If block is not allocated
             {
                 temp = b[j] - f[i];
-                if (temp >= 0)
-                    if (lowest > temp)
+                if (temp >= 0)  // If file fits in block
+                {
+                    if (lowest > temp)  // If this is the best fit so far
                     {
                         ff[i] = j;
                         lowest = temp;
                     }
+                }
             }
         }
-        frag[i] = lowest;
-        bf[ff[i]] = 1;
-        lowest = 10000;
+        
+        // Only allocate if a suitable block was found
+        if (ff[i] != 0)
+        {
+            frag[i] = lowest;  // Store fragment
+            bf[ff[i]] = 1;     // Mark block as allocated
+        }
+        else
+        {
+            frag[i] = -1;  // Indicate allocation failure
+        }
     }
     
     printf("\nFile No\tFile Size \tBlock No\tBlock Size\tFragment");
-    for (i = 1; i <= nf && ff[i] != 0; i++)
-        printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, f[i], ff[i], b[ff[i]], frag[i]);
+    for (i = 1; i <= nf; i++)
+    {
+        if (ff[i] != 0)
+            printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, f[i], ff[i], b[ff[i]], frag[i]);
+        else
+            printf("\n%d\t\t%d\t\tNot Allocated", i, f[i]);
+    }
     
     printf("\n");
     return 0;
